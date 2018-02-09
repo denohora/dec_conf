@@ -1,9 +1,9 @@
 #Test trials
 #DUMMYMODE = True # For demonstration
-#PRACTBLOCKNR = 1 # number of practice blocks
+#PRACTBLOCKNR = 0 # number of practice blocks
 #PRACTBLOCKSIZE = 12 # number of practice trials per block
-#RECBLOCKNR = 0 # number of recorded blocks
-#RECBLOCKSIZE = 0 # number of recorded trials per block
+#RECBLOCKNR = 1 # number of recorded blocks
+#RECBLOCKSIZE = 12 # number of recorded trials per block
 
 #Actual experiment
 DUMMYMODE = False # For data collection
@@ -12,7 +12,7 @@ PRACTBLOCKSIZE = 12 # number of practice trials per block
 RECBLOCKNR = 10 # number of recorded blocks
 RECBLOCKSIZE = 48 # number of recorded trials per block
 
-# 'smi', 'eyelink' or 'dummy' 
+# 'eyelink' or 'dummy' 
 TRACKERTYPE = 'eyelink' 
 #LOGFILENAME = 'eyedata' # logfilename, without path
 #LOGFILE = LOGFILENAME[:] # .txt; adding path before logfilename is optional
@@ -35,6 +35,8 @@ KEYBOARD_MODE = False # if not, mouse trajectories of response are recorded
 ID_RANGE = [101, 999]
 
 T_SIGNAL = 300
+
+TIMEOUT = 5000
 
 FIXATION_DURATION_RANGE = [700, 1000]
 TIMESTEP = 10 # if not keyboard mode, this sets mouse sampling interval in msec

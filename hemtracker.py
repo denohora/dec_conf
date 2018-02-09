@@ -83,17 +83,26 @@ class HEMTracker:
         
         response_dynamics_log, response, response_time = self.user_interface.show_stimulus_screen(
                                                                     trial_info=trial_info,
-                                                                    tracker=self.eye_tracker)
+                                                                    tracker=self.eye_tracker)        
         self.eye_tracker.stop_recording()
-        self.eye_tracker.start_recording(start_message = 'subject %s block %d trial %d' % 
-                                            (self.exp_info['subj_id'], block_number, trial_number))
+            
+        if response != 'TIMEOUT':
+            self.eye_tracker.start_recording(start_message = 'subject %s block %d trial %d' % 
+                                                (self.exp_info['subj_id'], block_number, trial_number))
+            
+            
+            gamble_log, gamble_time, gamble_value = self.user_interface.show_gamble_screen(
+                                                                trial_info=trial_info,
+                                                                response=response,
+                                                                tracker=self.eye_tracker)
+            self.eye_tracker.stop_recording()
+        else:
+            gamble_log = []
+            gamble_time = 0
+            gamble_value = 50          
         
-        gamble_log, gamble_time, gamble_value = self.user_interface.show_gamble_screen(
-                                                            trial_info=trial_info,
-                                                            response=response,
-                                                            tracker=self.eye_tracker)
-        self.eye_tracker.stop_recording()
-        
+        # is_correct is true only if response is the same as RDK direction
+        # If response is 'TIMEOUT', then is_correct = False
         is_correct = (response == trial_info['direction'])
         points_earned = gamble_value * (1 if is_correct else -1)
         accumulated_points += points_earned
@@ -103,7 +112,7 @@ class HEMTracker:
                         str(trial_info['coherence']), response, response_time, is_correct, 
                         gamble_value, gamble_time, points_earned]
 
-        self.user_interface.show_feedback_screen(points_earned, accumulated_points) 
+        self.user_interface.show_feedback_screen(points_earned, accumulated_points, response=='TIMEOUT') 
 
         # drift correction after every fifth trial
         if trial_number % 5 == 0:

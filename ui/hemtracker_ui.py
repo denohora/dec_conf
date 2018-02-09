@@ -255,6 +255,8 @@ Any questions?
                 response = 180
             elif self.mouse.mouse.isPressedIn(self.right_response_rect):
                 response = 0
+            elif (t > TIMEOUT):
+                response = 'TIMEOUT'                
                 
         self.mouse.set_visible(False)
         
@@ -291,7 +293,7 @@ Any questions?
         
         return gamble_log, t, gamble_value
     
-    def show_feedback_screen(self, points_earned, accumulated_points):       
+    def show_feedback_screen(self, points_earned, accumulated_points, is_timeout):
         self.mouse.set_visible(True)
         points_earned_str = '%i points'
         if points_earned > 0:
@@ -299,10 +301,13 @@ Any questions?
             self.feedback_text.setColor((52,201,64))
             self.feedback_points_earned.setColor((52,201,64))
             points_earned_str = '+' + points_earned_str
-        elif points_earned < 0:
-            self.feedback_text.setText('Incorrect!')
+        elif points_earned < 0:            
             self.feedback_text.setColor((196,46,46))
             self.feedback_points_earned.setColor((196,46,46))
+            if is_timeout:
+                self.feedback_text.setText('Please respond within %i seconds!' % (int(TIMEOUT)/1000))
+            else:
+                self.feedback_text.setText('Incorrect!')
             
         self.feedback_points_earned.setText(points_earned_str % (points_earned))
         self.feedback_accumulated_points.setText('Accumulated points: %i' % (accumulated_points))

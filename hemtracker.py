@@ -91,7 +91,8 @@ class HEMTracker:
                                                 (self.exp_info['subj_id'], block_number, trial_number))
             
             
-            gamble_log, gamble_time, gamble_value = self.user_interface.show_gamble_screen(
+            gamble_log, gamble_time, gamble_value, gamble_direction = \
+                                            self.user_interface.show_gamble_screen(
                                                                 trial_info=trial_info,
                                                                 response=response,
                                                                 tracker=self.eye_tracker)
@@ -100,19 +101,26 @@ class HEMTracker:
             gamble_log = []
             gamble_time = 0
             gamble_value = 50          
+            gamble_direction = 'right'
         
         # is_correct is true only if response is the same as RDK direction
         # If response is 'TIMEOUT', then is_correct = False
-        is_correct = (response == trial_info['direction'])
-        points_earned = gamble_value * (1 if is_correct else -1)
+        is_choice_correct = (response == trial_info['direction'])
+        is_gamble_correct = (gamble_direction == trial_info['direction'])
+        
+        points_earned = CHOICE_CORRECT_POINTS * (1 if is_choice_correct else 0) + \
+                        gamble_value * (1 if is_gamble_correct else -1)
+        
         accumulated_points += points_earned
         
         choice_info = [trial_info['subj_id'], trial_info['session_no'], trial_info['block_no'], 
                        trial_info['trial_no'], trial_info['is_practice'], trial_info['direction'], 
-                        str(trial_info['coherence']), response, response_time, is_correct, 
-                        gamble_value, gamble_time, points_earned]
+                        str(trial_info['coherence']), response, response_time, is_choice_correct, 
+                        is_gamble_correct, gamble_value, gamble_direction, gamble_time, points_earned]
 
-        self.user_interface.show_feedback_screen(points_earned, accumulated_points, response=='TIMEOUT') 
+        self.user_interface.show_feedback_screen(is_choice_correct, 
+                                                 gamble_value*(1 if is_gamble_correct else -1), 
+                                                 accumulated_points, response=='TIMEOUT') 
 
         # drift correction after every fifth trial
         if trial_number % 5 == 0:

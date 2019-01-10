@@ -21,7 +21,6 @@ class HEMTrackerUI:
     response_button_pos_right = (DISPSIZE[0]/2-response_button_size[0]/2, 
                                 DISPSIZE[1]/2-response_button_size[1]/2)
     
-    gambles = [10, 20, 30, 40, 50]
     gamble_button_size = (250, 60)
 
     def __init__(self):
@@ -110,37 +109,99 @@ Any questions?
         self.stimuli_screen.screen.append(self.right_response_rect)
 
     def initialize_gamble_screen(self, loc='left'):
+        ''' 
+        In this version of the task we have two sets of gamble buttons, so that a subject
+        can change their mind after initial response. Parameter loc defines the initially
+        chosen location, and depending on it, the gamble buttons are rendered in left or right half
+        of the screen.
+        
+        '''       
+        self.gamble_screen = libscreen.Screen()
+        
+        # Add the image for the clicked response
         response_button_pos = (self.response_button_pos_right if loc=='right' 
                                else self.response_button_pos_left)
-        img = self.right_response_image if loc=='right' else self.left_response_image
+        response_img = self.right_response_image if loc=='right' else self.left_response_image        
+        self.gamble_screen.screen.append(response_img)
         
-        self.gamble_screen = libscreen.Screen()
-        self.gamble_screen.screen.append(img)
-        self.gamble_rects = []
-        for i, gamble in enumerate(self.gambles):
-            pos=(response_button_pos[0], response_button_pos[1]-self.response_button_size[1]/2 - \
-                                                    (i+0.5)*self.gamble_button_size[1])
-            rect = visual.Rect(win=pygaze.expdisplay, pos=pos,
+        # Draw arrows under the clicked response
+        arrow_y_pos = response_button_pos[1]-self.response_button_size[1]/2 - \
+                              self.gamble_button_size[1]/2
+        if loc=='left':
+            arrow_left_pos=(response_button_pos[0], arrow_y_pos)                
+            arrow_right_pos=(response_button_pos[0]+self.gamble_button_size[0], arrow_y_pos)
+        elif loc=='right':
+            arrow_left_pos=(response_button_pos[0]-self.gamble_button_size[0], arrow_y_pos)                
+            arrow_right_pos=(response_button_pos[0], arrow_y_pos)                                     
+        
+        arrow_left_img = visual.ImageStim(win=pygaze.expdisplay, pos=arrow_left_pos,
+                                          image='resources/images/arrow_left_small.png')
+        arrow_right_img = visual.ImageStim(win=pygaze.expdisplay, pos=arrow_right_pos,
+                                          image='resources/images/arrow_right_small.png')         
+        self.gamble_screen.screen.append(arrow_left_img)
+        self.gamble_screen.screen.append(arrow_right_img)
+        
+        # Draw rectangles and texts with the gamble options
+        self.gamble_left_rects = []
+        self.gamble_right_rects = []
+        
+        for i, gamble in enumerate(GAMBLES):
+            y_pos = response_button_pos[1]-self.response_button_size[1]/2 - \
+                              (i+1.5)*self.gamble_button_size[1]
+            # left_pos and right_pos are the positions of buttons corresponding to left and right gamble
+            if loc=='left':
+                left_pos=(response_button_pos[0], y_pos)                
+                right_pos=(response_button_pos[0]+self.gamble_button_size[0], y_pos)
+            elif loc=='right':
+                left_pos=(response_button_pos[0]-self.gamble_button_size[0], y_pos)                
+                right_pos=(response_button_pos[0], y_pos)
+            
+            left_rect = visual.Rect(win=pygaze.expdisplay, pos=left_pos,
                                width=self.gamble_button_size[0], height=self.gamble_button_size[1],
                                 lineColor=(5,5,5), lineColorSpace='rgb255', 
                                 fillColor=(255, 250, 250), fillColorSpace='rgb255')
-            text = visual.TextStim(win=pygaze.expdisplay, pos=pos, text=gamble, height=36, 
+            left_text = visual.TextStim(win=pygaze.expdisplay, pos=left_pos, text=gamble, height=36, 
+                                   color=(5,5,5), colorSpace='rgb255')
+
+            right_rect = visual.Rect(win=pygaze.expdisplay, pos=right_pos,
+                               width=self.gamble_button_size[0], height=self.gamble_button_size[1],
+                                lineColor=(5,5,5), lineColorSpace='rgb255', 
+                                fillColor=(255, 250, 250), fillColorSpace='rgb255')
+            right_text = visual.TextStim(win=pygaze.expdisplay, pos=right_pos, text=gamble, height=36, 
                                    color=(5,5,5), colorSpace='rgb255')
             
-            self.gamble_screen.screen.append(rect)
-            self.gamble_screen.screen.append(text)
-            self.gamble_rects.append(rect)
+            self.gamble_screen.screen.append(left_rect)
+            self.gamble_screen.screen.append(left_text)
+            
+            self.gamble_screen.screen.append(right_rect)
+            self.gamble_screen.screen.append(right_text)
+            
+            self.gamble_left_rects.append(left_rect)
+            self.gamble_right_rects.append(right_rect)
     
     def initialize_feedback_screen(self):   
         self.feedback_screen = libscreen.Screen()
-        self.feedback_text = visual.TextStim(win=pygaze.expdisplay, 
-                                             colorSpace='rgb255', height = 36)
-        self.feedback_points_earned = visual.TextStim(win=pygaze.expdisplay, 
-                                               pos = (0, -100), colorSpace='rgb255', height = 36)
-        self.feedback_accumulated_points = visual.TextStim(win=pygaze.expdisplay, 
-                                               pos = (0, -175), height = 36)
         
-        self.feedback_screen.screen.append(self.feedback_text)
+        self.feedback_choice_text = visual.TextStim(win=pygaze.expdisplay, pos=(0,0),
+                                             colorSpace='rgb255', height=36)        
+        self.feedback_choice_points = visual.TextStim(win=pygaze.expdisplay, pos=(0,-75), 
+                                                      colorSpace='rgb255', height = 36)
+        
+        self.feedback_gamble_text = visual.TextStim(win=pygaze.expdisplay, pos=(0,-175),
+                                             colorSpace='rgb255', height=36)                
+        self.feedback_gamble_points = visual.TextStim(win=pygaze.expdisplay, pos=(0,-250), 
+                                                      colorSpace='rgb255', height = 36)
+
+        self.feedback_points_earned = visual.TextStim(win=pygaze.expdisplay, pos=(0,-350), 
+                                                           height = 36)
+        
+        self.feedback_accumulated_points = visual.TextStim(win=pygaze.expdisplay, pos=(0,-450), 
+                                                           height = 36)
+        
+        self.feedback_screen.screen.append(self.feedback_choice_text)
+        self.feedback_screen.screen.append(self.feedback_choice_points)
+        self.feedback_screen.screen.append(self.feedback_gamble_text)
+        self.feedback_screen.screen.append(self.feedback_gamble_points)
         self.feedback_screen.screen.append(self.feedback_points_earned)
         self.feedback_screen.screen.append(self.feedback_accumulated_points)
     
@@ -286,30 +347,58 @@ Any questions?
                                 str(t), mouse_position[0], mouse_position[1], 
                                 eye_position[0], eye_position[1], pupil_size])
             
-            for i, gamble in enumerate(self.gambles):
-                if self.mouse.mouse.isPressedIn(self.gamble_rects[i]):
+            for i, gamble in enumerate(GAMBLES):
+                if self.mouse.mouse.isPressedIn(self.gamble_left_rects[i]):
                     gamble_value = gamble
+                    gamble_direction = 180
+                elif self.mouse.mouse.isPressedIn(self.gamble_right_rects[i]):
+                    gamble_value = gamble
+                    gamble_direction = 0
+                    
         self.mouse.set_visible(False)
         
-        return gamble_log, t, gamble_value
+        return gamble_log, t, gamble_value, gamble_direction
     
-    def show_feedback_screen(self, points_earned, accumulated_points, is_timeout):
+    def show_feedback_screen(self, is_choice_correct, gamble_value, accumulated_points, is_timeout):
+        '''
+        Gamble value is assumed to be signed here (can be +/-)
+        '''
         self.mouse.set_visible(True)
-        points_earned_str = '%i points'
-        if points_earned > 0:
-            self.feedback_text.setText('Correct!')
-            self.feedback_text.setColor((52,201,64))
-            self.feedback_points_earned.setColor((52,201,64))
-            points_earned_str = '+' + points_earned_str
-        elif points_earned < 0:            
-            self.feedback_text.setColor((196,46,46))
-            self.feedback_points_earned.setColor((196,46,46))
-            if is_timeout:
-                self.feedback_text.setText('Please respond within %i seconds!' % (int(TIMEOUT)/1000))
+        choice_points_str = '+%i points'
+        gamble_points_str = '%s%i points'
+        points_earned_str = '%s%i points'
+        
+        if is_timeout:
+            self.feedback_choice_text.setText('Please respond within %i seconds!' % (int(TIMEOUT)/1000))
+            self.feedback_choice_text.setColor(NEGATIVE_FEEDBACK_COLOR)
+        else:            
+            points_earned = gamble_value            
+            if is_choice_correct:
+                points_earned += CHOICE_CORRECT_POINTS
+                self.feedback_choice_text.setText('Correct choice')
+                self.feedback_choice_text.setColor(POSITIVE_FEEDBACK_COLOR)
+                self.feedback_choice_points.setColor(POSITIVE_FEEDBACK_COLOR)
+                self.feedback_choice_points.setText(choice_points_str % (CHOICE_CORRECT_POINTS))
             else:
-                self.feedback_text.setText('Incorrect!')
+                self.feedback_choice_text.setText('Incorrect choice')                
+                self.feedback_choice_text.setColor(NEGATIVE_FEEDBACK_COLOR)
+                self.feedback_choice_points.setText('')
+                
+            if gamble_value>0:
+                self.feedback_gamble_text.setText('Correct gamble')
+                self.feedback_gamble_text.setColor(POSITIVE_FEEDBACK_COLOR)
+                self.feedback_gamble_points.setColor(POSITIVE_FEEDBACK_COLOR)
+            else:
+                self.feedback_gamble_text.setText('Incorrect gamble')
+                self.feedback_gamble_text.setColor(NEGATIVE_FEEDBACK_COLOR)
+                self.feedback_gamble_points.setColor(NEGATIVE_FEEDBACK_COLOR)
             
-        self.feedback_points_earned.setText(points_earned_str % (points_earned))
+            self.feedback_gamble_points.setText(gamble_points_str % (('+' if gamble_value>0 else ''), 
+                                                                     gamble_value))
+            
+            self.feedback_points_earned.setText(points_earned_str % (('+' if points_earned>0 else ''), 
+                                                                     points_earned))
+        
         self.feedback_accumulated_points.setText('Accumulated points: %i' % (accumulated_points))
         self.disp.fill(self.feedback_screen)
         self.disp.show()

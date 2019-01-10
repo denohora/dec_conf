@@ -5,8 +5,14 @@
 #RECBLOCKNR = 1 # number of recorded blocks
 #RECBLOCKSIZE = 12 # number of recorded trials per block
 
+CHOICE_CORRECT_POINTS = 10
+GAMBLES = [10, 20, 30, 40, 50]
+
+POSITIVE_FEEDBACK_COLOR = (52,201,64)
+NEGATIVE_FEEDBACK_COLOR = (196,46,46)
+
 #Actual experiment
-DUMMYMODE = False # For data collection
+DUMMYMODE = True # For data collection
 PRACTBLOCKNR = 1 # number of practice blocks
 PRACTBLOCKSIZE = 12 # number of practice trials per block
 RECBLOCKNR = 10 # number of recorded blocks

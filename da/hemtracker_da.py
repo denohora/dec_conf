@@ -30,8 +30,9 @@ class HEMTrackerDA:
         with open(self.choices_log_file, 'ab+') as fp:
             writer = csv.writer(fp, delimiter = '\t')
             writer.writerow(['subj_id', 'session_no', 'block_no', 'trial_no', 'is_practice', 
-                             'direction', 'coherence', 'response', 'response_time', 'is_correct',
-                             'gamble_value', 'gamble_time', 'points_earned'])
+                             'direction', 'coherence', 'response', 'response_time', 
+                             'is_choice_correct', 'is_gamble_correct', 'gamble_value', 
+                             'gamble_direction', 'gamble_time', 'points_earned'])
 
         if not os.path.exists(log_path % 'dynamics'):
             os.makedirs(log_path % 'dynamics')

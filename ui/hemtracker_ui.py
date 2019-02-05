@@ -367,12 +367,20 @@ Any questions?
         choice_points_str = '+%i points'
         gamble_points_str = '%s%i points'
         points_earned_str = '%s%i points'
+
+        points_earned = gamble_value
         
         if is_timeout:
             self.feedback_choice_text.setText('Please respond within %i seconds!' % (int(TIMEOUT)/1000))
             self.feedback_choice_text.setColor(NEGATIVE_FEEDBACK_COLOR)
-        else:            
-            points_earned = gamble_value            
+            
+            self.feedback_choice_points.setText('')
+            
+            self.feedback_gamble_text.setText('Timeout penalty')
+            self.feedback_gamble_text.setColor(NEGATIVE_FEEDBACK_COLOR)
+            
+            self.feedback_gamble_points.setColor(NEGATIVE_FEEDBACK_COLOR)
+        else:
             if is_choice_correct:
                 points_earned += CHOICE_CORRECT_POINTS
                 self.feedback_choice_text.setText('Correct choice')
@@ -393,10 +401,10 @@ Any questions?
                 self.feedback_gamble_text.setColor(NEGATIVE_FEEDBACK_COLOR)
                 self.feedback_gamble_points.setColor(NEGATIVE_FEEDBACK_COLOR)
             
-            self.feedback_gamble_points.setText(gamble_points_str % (('+' if gamble_value>0 else ''), 
+        self.feedback_gamble_points.setText(gamble_points_str % (('+' if gamble_value>0 else ''), 
                                                                      gamble_value))
             
-            self.feedback_points_earned.setText(points_earned_str % (('+' if points_earned>0 else ''), 
+        self.feedback_points_earned.setText(points_earned_str % (('+' if points_earned>0 else ''), 
                                                                      points_earned))
         
         self.feedback_accumulated_points.setText('Accumulated points: %i' % (accumulated_points))

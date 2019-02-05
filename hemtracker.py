@@ -101,10 +101,11 @@ class HEMTracker:
             gamble_log = []
             gamble_time = 0
             gamble_value = 50          
-            gamble_direction = 'right'
+            gamble_direction = 'TIMEOUT'
         
-        # is_correct is true only if response is the same as RDK direction
-        # If response is 'TIMEOUT', then is_correct = False
+        # is_response_correct is true only if response is the same as RDK direction
+        # If response is 'TIMEOUT', then is_response_correct = False
+        # same with is_gamble_correct
         is_choice_correct = (response == trial_info['direction'])
         is_gamble_correct = (gamble_direction == trial_info['direction'])
         
